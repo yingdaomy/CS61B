@@ -1,16 +1,16 @@
-public class SSList<Type> {
+public class SSList<Type> implements List61B<Type>{
 
-    public class IntNode {
-        int item;
-        IntNode next;
+    public class ItemNode {
+        Type item;
+        ItemNode next;
 
-        public IntNode(int i, IntNode n) {
+        public ItemNode(Type i, ItemNode n) {
             item = i;
             next = n;
         }
     }
 
-    private IntNode sentinel = new IntNode(2025, null);
+    private ItemNode sentinel = new ItemNode(null, null);
     int size;
 
 
@@ -18,42 +18,96 @@ public class SSList<Type> {
         size = 0;
     }
 
-    public SSList(int x) {
-        sentinel.next = new IntNode(x, null);
+    public SSList(Type x) {
+        sentinel.next = new ItemNode(x, null);
         size = 1;
     }
 
-    public void addFirst(int x) {
+    @Override
+    public void addFirst(Type x) {
         /** Adds x to the front of the list. */
-        sentinel.next = new IntNode(x, sentinel.next);
+        sentinel.next = new ItemNode(x, sentinel.next);
         size += 1;
     }
 
-    public int getFirst() {
+    @Override
+    public Type getFirst() {
         /** Returns the first item in the list. */
         return sentinel.next.item;
     }
 
-    public void addLast(int x) {
+    @Override
+    public void addLast(Type x) {
         /** Adds x to the end of the list. */
-        IntNode newNode = new IntNode(x, null);
-        IntNode tempNode = sentinel.next;
-        while (tempNode.next != null) {
-            tempNode = tempNode.next;
+        ItemNode newNode = new ItemNode(x, null);
+        ItemNode tempNode = sentinel.next;
+        if (tempNode == null) {
+            sentinel.next = newNode;
+        } else {
+            while (tempNode.next != null) {
+                tempNode = tempNode.next;
+            }
+            tempNode.next = newNode;
         }
-        tempNode.next = newNode;
         size += 1;
     }
 
+    @Override
     public int size() {
         /** Return the size of the list. */
         return size;
     }
 
-    public static void main(String[] args) {
-        SSList<Integer> L = new SSList<Integer>(10);
-        L.addFirst(15);
-        L.addFirst(20);
-        System.out.println(L.getFirst());
+    private Type get(int index, ItemNode p) {
+        if (index == 0) {
+            return p.item;
+        } else {
+            return get(index - 1, p.next);
+        }
+    }
+
+    @Override
+    public Type get(int index) {
+        return get(index, sentinel.next);
+    }
+
+    @Override
+    public void insert(Type x, int position) {
+        int index = 0;
+        ItemNode p = sentinel;
+        while (index != position) {
+            p = p.next;
+            index += 1;
+        }
+        ItemNode newNode = new ItemNode(x, p.next);
+        p.next = newNode;
+    }
+
+    @Override
+    public Type getLast() {
+        ItemNode p = sentinel.next;
+        while (p.next != null) {
+            p = p.next;
+        }
+        return p.item;
+    }
+
+    @Override
+    public Type removeLast() {
+        ItemNode p = sentinel;
+        while (p.next.next != null) {
+            p = p.next;
+        }
+        Type result = p.next.item;
+        p.next = null;
+        return result;
+    }
+
+    @Override
+    public void print() {
+        for (ItemNode p = sentinel.next; p != null; p = p.next) {
+            System.out.print(p.item + " ");
+        }
+        System.out.println();
     }
 }
