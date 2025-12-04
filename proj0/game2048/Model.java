@@ -94,6 +94,8 @@ public class Model extends Observable {
         setChanged();
     }
 
+
+
     /** Tilt the board toward SIDE. Return true iff this changes the board.
      *
      * 1. If two Tile objects are adjacent in the direction of motion and have
@@ -114,10 +116,51 @@ public class Model extends Observable {
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
 
+        board.setViewingPerspective(side);
+
+        for (int i = 0; i < board.size(); i += 1) {
+            boolean[] merged = new boolean[]{false, false, false, false};
+            for (int j = board.size() - 2; j >= 0; j -= 1) {
+                if (board.tile(i, j) == null) {
+                    continue;
+                } else {
+                    Tile tile = board.tile(i, j);
+                    int objectiveRow = j + 1;
+                    while (objectiveRow != board.size() - 1 && board.tile(i, objectiveRow) == null) {
+                        objectiveRow += 1;
+                    }
+                    if (board.tile(i, objectiveRow) == null) {
+                        board.move(i, objectiveRow, tile);
+                        changed = true;
+                    } else {
+                        if (board.tile(i, objectiveRow).value() == tile.value()) {
+                            if (!merged[objectiveRow]) {
+                                board.move(i, objectiveRow, tile);
+                                changed = true;
+                                score += tile.value() * 2;
+                                merged[objectiveRow] = true;
+                            } else {
+                                if (objectiveRow - 1 != j) {
+                                    board.move(i, objectiveRow - 1, tile);
+                                    changed = true;
+                                }
+                            }
+                        } else {
+                            if (objectiveRow - 1 != j) {
+                                board.move(i, objectiveRow - 1, tile);
+                                changed = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         checkGameOver();
         if (changed) {
             setChanged();
         }
+        board.setViewingPerspective(Side.NORTH);
         return changed;
     }
 
@@ -138,6 +181,13 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        for (int i = 0; i < b.size(); i += 1) {
+            for (int j = 0; j < b.size(); j += 1) {
+                if (b.tile(i, j) == null) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -148,6 +198,34 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        for (int i = 0; i < b.size(); i += 1) {
+            for (int j = 0; j < b.size(); j += 1) {
+                if (b.tile(i, j) != null) {
+                    if (b.tile(i, j).value() >= MAX_PIECE) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean adjacentSameTile(Board b) {
+        int[] dx = new int[]{-1, 0, 1, 0};
+        int[] dy = new int[]{0, 1, 0, -1};
+        for (int i = 0; i < b.size(); i += 1) {
+            for (int j = 0; j < b.size(); j += 1) {
+                for (int k = 0; k < 4; k += 1) {
+                    if (i + dx[k] < 0 || i + dx[k] >= b.size() || j + dy[k] < 0 || j + dy[k] >= b.size()) {
+                        continue;
+                    } else {
+                        if (b.tile(i, j).value() == b.tile(i + dx[k], j + dy[k]).value()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -159,6 +237,9 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        if (emptySpaceExists(b) || adjacentSameTile(b)) {
+            return true;
+        }
         return false;
     }
 
