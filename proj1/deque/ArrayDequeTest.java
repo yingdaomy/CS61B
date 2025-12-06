@@ -96,13 +96,7 @@ public class ArrayDequeTest {
     /** Add large number of elements to deque; check if order is correct. */
     public void bigArrayDequeTest() {
         ArrayDeque<Integer> ad = new  ArrayDeque<>();
-]
 
-
-
-
-
-        
         for (int i = 0; i < 100; i += 1) {
             ad.addFirst(i);
         }

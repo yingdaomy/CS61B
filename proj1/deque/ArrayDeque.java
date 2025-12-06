@@ -8,7 +8,7 @@ public class ArrayDeque<T> implements Deque<T> {
     private int size;
 
     public ArrayDeque() {
-        items = (T[]) new Object[10];
+        items = (T[]) new Object[8];
         front = 0;
         rear = 0;
         size = 0;
@@ -49,10 +49,6 @@ public class ArrayDeque<T> implements Deque<T> {
         }
     }
 
-    @Override
-    public boolean isEmpty() {
-        return front == rear;
-    }
 
     @Override
     public int size() {
